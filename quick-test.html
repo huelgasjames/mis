@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Lab Stats Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Quick Laboratory Stats Test</h1>
+    <button onclick="testStats()">Test Laboratory Stats</button>
+    <div id="results"></div>
+
+    <script>
+        async function testStats() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="result">Testing...</div>';
+            
+            try {
+                console.log('Testing API...');
+                const response = await fetch('http://127.0.0.1:8000/api/laboratories/stats');
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Data received:', data);
+                    results.innerHTML = `
+                        <div class="result success">
+                            <h3>✅ SUCCESS</h3>
+                            <p>Total Labs: ${data.total_labs}</p>
+                            <p>Total PCs: ${data.total_pcs}</p>
+                            <p>Deployed: ${data.deployed}</p>
+                            <p>Under Repair: ${data.under_repair}</p>
+                            <p>Available: ${data.available}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML = `
+                        <div class="result error">
+                            <h3>❌ ERROR</h3>
+                            <p>HTTP ${response.status}: ${response.statusText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                results.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ CONNECTION ERROR</h3>
+                        <p>${error.message}</p>
+                        <p><strong>Solution:</strong> Make sure Laravel server is running: <code>php artisan serve</code></p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        window.onload = testStats;
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laboratory API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Laboratory Management API Test</h1>
+    
+    <div id="results"></div>
+
+    <script>
+        const apiBase = 'http://127.0.0.1:8000/api';
+        const results = document.getElementById('results');
+
+        function addResult(title, success, data) {
+            const div = document.createElement('div');
+            div.className = `test-section ${success ? 'success' : 'error'}`;
+            div.innerHTML = `
+                <h3>${title} - ${success ? '✅ SUCCESS' : '❌ ERROR'}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            results.appendChild(div);
+        }
+
+        async function testAPIs() {
+            try {
+                // Test 1: Get Laboratories
+                const labsResponse = await fetch(`${apiBase}/laboratories`);
+                const labsData = await labsResponse.json();
+                addResult('GET /api/laboratories', labsResponse.ok, labsData);
+
+                // Test 2: Get Laboratory Stats
+                const statsResponse = await fetch(`${apiBase}/laboratories/stats`);
+                const statsData = await statsResponse.json();
+                addResult('GET /api/laboratories/stats', statsResponse.ok, statsData);
+
+                // Test 3: Get Under Repair PCs
+                const repairResponse = await fetch(`${apiBase}/laboratory-inventory/under-repair`);
+                const repairData = await repairResponse.json();
+                addResult('GET /api/laboratory-inventory/under-repair', repairResponse.ok, repairData);
+
+            } catch (error) {
+                addResult('API Test Error', false, { error: error.message });
+            }
+        }
+
+        // Run tests when page loads
+        testAPIs();
+    </script>
+</body>
+</html>

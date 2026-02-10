@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laboratory Stats Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 15px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        .warning { background-color: #fff3cd; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; }
+        .step { margin: 10px 0; padding: 10px; border-left: 4px solid #007bff; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Laboratory Management Stats Debug</h1>
+    
+    <div id="debug-results"></div>
+
+    <script>
+        const apiBase = 'http://127.0.0.1:8000/api';
+        const results = document.getElementById('debug-results');
+
+        function addStep(title, status, message, data = null) {
+            const div = document.createElement('div');
+            div.className = `step debug-section ${status}`;
+            let content = `<h3>${title}</h3><p>${message}</p>`;
+            if (data) {
+                content += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            div.innerHTML = content;
+            results.appendChild(div);
+        }
+
+        async function debugSystem() {
+            addStep('🚀 Starting Debug Process', 'warning', 'Checking Laboratory Management system...');
+
+            // Step 1: Check Laravel server connectivity
+            try {
+                const response = await fetch(`${apiBase}/laboratories`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addStep('✅ Laravel Server Connected', 'success', `Server is running and responding. Found ${data.length} laboratories.`, data);
+                } else {
+                    addStep('❌ Laravel Server Error', 'error', `HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addStep('❌ Connection Failed', 'error', `Cannot connect to Laravel server: ${error.message}. Make sure 'php artisan serve' is running on port 8000.`);
+                return;
+            }
+
+            // Step 2: Test stats endpoint specifically
+            try {
+                const statsResponse = await fetch(`${apiBase}/laboratories/stats`);
+                
+                if (statsResponse.ok) {
+                    const statsData = await statsResponse.json();
+                    addStep('✅ Stats API Working', 'success', 'Stats endpoint is responding correctly.', statsData);
+                    
+                    // Check if stats have actual data
+                    if (statsData.total_labs > 0 && statsData.total_pcs > 0) {
+                        addStep('✅ Stats Have Data', 'success', `Found ${statsData.total_labs} labs and ${statsData.total_pcs} PCs.`);
+                    } else {
+                        addStep('⚠️ Stats Empty', 'warning', 'Stats endpoint works but returns 0 values. Check database seeders.');
+                    }
+                } else {
+                    addStep('❌ Stats API Failed', 'error', `Stats endpoint returned HTTP ${statsResponse.status}`);
+                }
+            } catch (error) {
+                addStep('❌ Stats API Error', 'error', `Stats endpoint error: ${error.message}`);
+            }
+
+            // Step 3: Check frontend data structure
+            try {
+                const labsResponse = await fetch(`${apiBase}/laboratories`);
+                const labsData = await labsResponse.json();
+                
+                // Check if labs have expected properties
+                const firstLab = labsData[0];
+                if (firstLab && firstLab.deployed_count !== undefined) {
+                    addStep('✅ Lab Data Structure Correct', 'success', 'Laboratory data includes computed counts.');
+                } else {
+                    addStep('⚠️ Lab Data Structure Issue', 'warning', 'Laboratory data missing computed properties like deployed_count.');
+                }
+            } catch (error) {
+                addStep('❌ Lab Data Check Failed', 'error', `Error checking lab data: ${error.message}`);
+            }
+
+            // Step 4: Simulate frontend fetch
+            try {
+                const [labsRes, statsRes, repairRes] = await Promise.all([
+                    fetch(`${apiBase}/laboratories`),
+                    fetch(`${apiBase}/laboratories/stats`),
+                    fetch(`${apiBase}/laboratory-inventory/under-repair`)
+                ]);
+
+                const frontendData = {
+                    labs: labsRes.ok ? await labsRes.json() : 'ERROR',
+                    stats: statsRes.ok ? await statsRes.json() : 'ERROR',
+                    repair: repairRes.ok ? await repairRes.json() : 'ERROR'
+                };
+
+                addStep('✅ Frontend Data Fetch Test', 'success', 'Simulated frontend data fetch works.', frontendData);
+            } catch (error) {
+                addStep('❌ Frontend Simulation Failed', 'error', `Frontend simulation error: ${error.message}`);
+            }
+
+            addStep('🏁 Debug Complete', 'warning', 'Check the results above to identify the issue.');
+        }
+
+        // Run debug when page loads
+        debugSystem();
+    </script>
+</body>
+</html>
