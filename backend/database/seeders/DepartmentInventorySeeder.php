@@ -24,6 +24,24 @@ class DepartmentInventorySeeder extends Seeder
             return;
         }
 
+        // Check all required departments
+        $missingDepts = [];
+        if (!$comlabDept) $missingDepts[] = 'MISD - Computer Laboratory';
+        if (!$techSupportDept) $missingDepts[] = 'MISD - Technical Support';
+        if (!$networkOpsDept) $missingDepts[] = 'MISD - Network Operations';
+        if (!$sysDevDept) $missingDepts[] = 'MISD - Systems Development';
+        
+        if (!empty($missingDepts)) {
+            $this->command->warn('Missing departments: ' . implode(', ', $missingDepts));
+            $this->command->warn('Using MISD department as fallback.');
+        }
+
+        // Use fallback for missing departments
+        $comlabDept = $comlabDept ?? $misdDept;
+        $techSupportDept = $techSupportDept ?? $misdDept;
+        $networkOpsDept = $networkOpsDept ?? $misdDept;
+        $sysDevDept = $sysDevDept ?? $misdDept;
+
         $inventory = [
             [
                 'asset_tag' => 'MISD-SU-003',
@@ -316,13 +334,19 @@ class DepartmentInventorySeeder extends Seeder
         }
 
         // Insert all inventory items
+        $count = 0;
         foreach ($inventory as $item) {
-            DepartmentInventory::updateOrCreate(
-                ['asset_tag' => $item['asset_tag']],
-                $item
-            );
+            try {
+                DepartmentInventory::updateOrCreate(
+                    ['asset_tag' => $item['asset_tag']],
+                    $item
+                );
+                $count++;
+            } catch (\Exception $e) {
+                $this->command->error("Failed to insert {$item['asset_tag']}: " . $e->getMessage());
+            }
         }
 
-        $this->command->info('Department inventory seeded successfully!');
+        $this->command->info("Department inventory seeded successfully! ({$count} items)");
     }
 }

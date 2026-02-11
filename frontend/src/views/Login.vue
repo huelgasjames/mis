@@ -53,6 +53,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useSessionTimeout } from '../composables/useSessionTimeout'
 
 const router = useRouter()
 const email = ref('')
@@ -74,8 +75,15 @@ const login = async () => {
 
     if (response.ok) {
       const data = await response.json()
-      // Store token and redirect
+      // Store token and user data
       localStorage.setItem('auth_token', data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      localStorage.setItem('session_timeout', data.session_timeout)
+      
+      // Start session timeout monitoring
+      const { startSession } = useSessionTimeout()
+      startSession(data.session_timeout, data.user.role)
+      
       router.push('/dashboard')
     } else {
       let message = `Login failed (HTTP ${response.status})`

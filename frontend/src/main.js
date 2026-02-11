@@ -9,7 +9,7 @@ app.use(router)
 
 app.mount('#app')
 
-// Hide splash screen after app mounts
+// Hide splash screen after app mountsaa
 window.addEventListener('load', () => {
   const splashScreen = document.getElementById('splash-screen')
   if (splashScreen) {

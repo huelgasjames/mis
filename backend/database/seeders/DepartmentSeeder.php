@@ -63,7 +63,10 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $dept) {
-            Department::create($dept);
+            Department::create([
+                'name' => $dept['name'],
+                'office_location' => $dept['office_location'],
+            ]);
         }
 
         $this->command->info('MISD-focused department structure seeded successfully!');

@@ -38,8 +38,8 @@ class CategorySeeder extends Seeder
             ],
             [
                 'id' => '550e8400-e29b-41d4-a716-446655440003',
-                'code' => 'SR',
-                'name' => 'Server',
+                'code' => 'SU',
+                'name' => 'System Unit',
                 'description' => 'Server computer systems',
                 'is_editable' => false, // System category - not editable by users
                 'is_active' => true,

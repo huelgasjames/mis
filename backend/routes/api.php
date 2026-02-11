@@ -14,7 +14,7 @@ use App\Http\Controllers\StorageController;
 use App\Http\Controllers\DepartmentInventoryController;
 use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\LaboratoryInventoryController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SessionController;
 
 Route::apiResource('assets', AssetController::class);
 Route::apiResource('departments', DepartmentController::class);
@@ -61,3 +61,11 @@ Route::get('categories/editable', [CategoryController::class, 'getEditable']);
 Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus']);
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [SessionController::class, 'logout']);
+Route::get('/session/status', [SessionController::class, 'status']);
+Route::post('/session/ping', [SessionController::class, 'ping']);
+Route::post('/session/extend', [SessionController::class, 'extend']);
+
+// Admin session management
+Route::get('/admin/sessions', [SessionController::class, 'activeSessions']);
+Route::post('/admin/sessions/{userId}/logout', [SessionController::class, 'forceLogout']);

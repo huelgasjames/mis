@@ -7,17 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
-        'uuid',
         'name',
         'office_location',
     ];
@@ -25,11 +23,6 @@ class Department extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
-
-    protected $hidden = [
-        'deleted_at',
     ];
 
     protected $appends = [
@@ -40,12 +33,12 @@ class Department extends Model
     // Relationships
     public function assets(): HasMany
     {
-        return $this->hasMany(Asset::class, 'department_id', 'uuid')->withTrashed();
+        return $this->hasMany(Asset::class, 'department_id', 'uuid');
     }
 
     public function departmentInventory(): HasMany
     {
-        return $this->hasMany(DepartmentInventory::class, 'department_id', 'uuid')->withTrashed();
+        return $this->hasMany(DepartmentInventory::class, 'department_id', 'uuid');
     }
 
     public function auditLogs(): MorphMany

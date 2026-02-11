@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DepartmentInventory extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $table = 'department_inventory';
 
@@ -59,12 +58,12 @@ class DepartmentInventory extends Model
     // Relationships
     public function department(): BelongsTo
     {
-        return $this->belongsTo(Department::class, 'department_id', 'uuid')->withTrashed();
+        return $this->belongsTo(Department::class, 'department_id', 'uuid');
     }
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id')->withTrashed();
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function maintenanceRecords(): HasMany

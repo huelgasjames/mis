@@ -18,6 +18,15 @@ class AssetSeeder extends Seeder
         // Get department IDs
         $deptIds = DB::table('departments')->pluck('id', 'name')->toArray();
 
+        // Check if departments exist
+        if (empty($deptIds)) {
+            $this->command->warn('No departments found. Please run DepartmentSeeder first.');
+            return;
+        }
+
+        // Get first available department as fallback
+        $firstDeptId = reset($deptIds);
+
         $assets = [
             [
                 'asset_tag' => 'MISD-SU-0001',
@@ -32,7 +41,7 @@ class AssetSeeder extends Seeder
                 'storage' => '512GB SSD',
                 'serial_number' => 'SPHV',
                 'status' => 'Working',
-                'department_id' => $deptIds['MISD'] ?? 1,
+                'department_id' => $deptIds['MISD'] ?? $firstDeptId,
             ],
             [
                 'asset_tag' => 'MISD-SU-0002',
@@ -47,52 +56,52 @@ class AssetSeeder extends Seeder
                 'storage' => '1TB NVMe SSD',
                 'serial_number' => 'RTX3070-001',
                 'status' => 'Working',
-                'department_id' => $deptIds['MISD'] ?? 1,
+                'department_id' => $deptIds['MISD'] ?? $firstDeptId,
             ],
             [
-                'asset_tag' => 'HRMD-LP-0001',
-                'computer_name' => 'HR-Laptop-01',
-                'category' => 'Laptop',
-                'processor' => 'Intel Core i5-1135G7',
-                'motherboard' => 'HP OEM',
-                'video_card' => 'Intel Iris Xe',
-                'dvd_rom' => 'N/A',
-                'psu' => 'Integrated',
-                'ram' => '8GB',
-                'storage' => '256GB SSD',
-                'serial_number' => 'HP-8BG1234',
-                'status' => 'Working',
-                'department_id' => $deptIds['HRMD'] ?? 2,
-            ],
-            [
-                'asset_tag' => 'FD-DT-0001',
-                'computer_name' => 'Finance-Desktop',
+                'asset_tag' => 'MISD-LAB-0001',
+                'computer_name' => 'MISD-LAB-PC001',
                 'category' => 'Desktop',
-                'processor' => 'Intel Core i3-10100',
-                'motherboard' => 'Gigabyte H410M',
-                'video_card' => 'N/A',
-                'dvd_rom' => 'LG DVD-ROM',
-                'psu' => 'Cooler Master 500W',
+                'processor' => 'Intel Core i5-12400',
+                'motherboard' => 'Dell OptiPlex 7090',
+                'video_card' => 'Intel UHD Graphics 730',
+                'dvd_rom' => 'N/A',
+                'psu' => '260W',
                 'ram' => '16GB',
-                'storage' => '1TB HDD',
-                'serial_number' => 'FIN-001',
-                'status' => 'Defective',
-                'department_id' => $deptIds['FD'] ?? 3,
+                'storage' => '512GB SSD',
+                'serial_number' => 'MISD-LAB-001',
+                'status' => 'Working',
+                'department_id' => $deptIds['MISD - Computer Laboratory'] ?? $firstDeptId,
             ],
             [
-                'asset_tag' => 'CCS-SRV-0001',
-                'computer_name' => 'CCS-Server-01',
+                'asset_tag' => 'MISD-SYS-0001',
+                'computer_name' => 'MISD-SYS-SRV001',
                 'category' => 'Server',
-                'processor' => 'Intel Xeon E-2288G',
-                'motherboard' => 'Supermicro X11SCA',
-                'video_card' => 'Matrox G200e',
+                'processor' => 'Intel Xeon Silver 4210R',
+                'motherboard' => 'Dell PowerEdge R740',
+                'video_card' => 'Matrox G200eR3',
                 'dvd_rom' => 'N/A',
-                'psu' => '冗余 800W',
-                'ram' => '64GB',
-                'storage' => '2TB RAID 10',
-                'serial_number' => 'SRV-CCS-001',
+                'psu' => '750W Redundant',
+                'ram' => '64GB DDR4 ECC',
+                'storage' => '2x 1TB SAS HDD RAID 1',
+                'serial_number' => 'MISD-SYS-001',
                 'status' => 'Working',
-                'department_id' => $deptIds['CCS'] ?? 4,
+                'department_id' => $deptIds['MISD - Technical Support'] ?? $firstDeptId,
+            ],
+            [
+                'asset_tag' => 'MISD-NET-0001',
+                'computer_name' => 'MISD-NET-RT001',
+                'category' => 'Server',
+                'processor' => 'Intel Xeon D-1521',
+                'motherboard' => 'Cisco ISR 4321',
+                'video_card' => 'N/A',
+                'dvd_rom' => 'N/A',
+                'psu' => 'Internal PSU',
+                'ram' => '4GB DDR3',
+                'storage' => '8GB Flash',
+                'serial_number' => 'MISD-NET-001',
+                'status' => 'Working',
+                'department_id' => $deptIds['MISD - Network Operations'] ?? $firstDeptId,
             ],
         ];
 
@@ -102,5 +111,7 @@ class AssetSeeder extends Seeder
                 array_merge($asset, ['created_at' => $now, 'updated_at' => $now])
             );
         }
+
+        $this->command->info('Assets seeded successfully!');
     }
-}
+}  

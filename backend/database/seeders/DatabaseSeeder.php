@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             \Database\Seeders\DepartmentSeeder::class,
             \Database\Seeders\LaboratorySeeder::class,
             \Database\Seeders\UserSeeder::class,
+            \Database\Seeders\AssetSeeder::class,
             \Database\Seeders\LaboratoryInventorySeeder::class,
             \Database\Seeders\ProcessorSeeder::class,
             \Database\Seeders\MotherboardSeeder::class,
